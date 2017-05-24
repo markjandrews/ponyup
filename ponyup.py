@@ -17,26 +17,7 @@ from ponyup.common import wait_until_browser_close
 SCRIPT_DIR = os.path.dirname(__file__)
 CHROME_PATH = os.path.join(SCRIPT_DIR, 'chromedriver.exe')
 
-
-def find_input_files(input_file):
-    if os.path.exists(input_file):
-        return [input_file]
-
-    input_dir, input_filename = os.path.split(os.path.abspath(input_file))
-    base, ext = os.path.splitext(input_filename)
-
-    input_files = []
-
-    for file_in_dir in os.listdir(input_dir):
-        full_filepath = os.path.join(input_dir, file_in_dir)
-        if not os.path.isfile(full_filepath):
-            continue
-
-        m = re.match(r'%s\d+%s' % (base, ext), file_in_dir)
-        if m:
-            input_files.append(full_filepath)
-
-    return input_files
+MAX_GAMES_PER_ENTRY = 50
 
 
 def main(argv=sys.argv[1:]):
@@ -50,19 +31,19 @@ def main(argv=sys.argv[1:]):
 
     password = auth.get_creds('nswlotteries', args.user_name, args.password)
 
-    input_files = find_input_files(args.input_file)
+    print('Processing: %s' % args.input_file)
+    with open(args.input_file, 'r') as inf:
+        picked_list = json.load(inf)
 
-    for input_file in input_files:
-        print('Processing: %s' % input_file)
-        with open(input_file, 'r') as inf:
-            picked_list = json.load(inf)
-
+    current_game = 0
+    while current_game < len(picked_list):
         processor = configs[args.game].klass(webdriver.Chrome(CHROME_PATH), args.user_name, password)
-        processor.set_games(picked_list)
-
+        entry_picked_list = picked_list[current_game:current_game + MAX_GAMES_PER_ENTRY]
+        processor.set_games(entry_picked_list)
         wait_until_browser_close(processor.driver)
+        current_game += MAX_GAMES_PER_ENTRY
 
-        print('Processing Complete')
+    print('Processing Complete')
 
 if __name__ == '__main__':
     main()

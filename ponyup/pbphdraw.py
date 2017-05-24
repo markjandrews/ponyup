@@ -1,4 +1,8 @@
+import weakref
+
 import sys
+
+import time
 
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
@@ -6,7 +10,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from ponyup.common import login_to_site, logout_of_site, wait_until_clickable
 
 
-class OzLottoDraw(object):
+class PowerBallPHDraw(object):
     def __init__(self, driver, user_name, password):
         self.driver = driver
 
@@ -15,9 +19,9 @@ class OzLottoDraw(object):
 
         login_to_site(driver, user_name, password)
 
-        driver.get('https://thelott.com/nswlotteries/buy-lotto/purchase-ticket?product=OzLotto')
+        driver.get('https://thelott.com/nswlotteries/buy-lotto/purchase-ticket?product=Powerball')
         driver.find_element_by_xpath(
-            "//div[@id='StandardGamesDiv']").click()
+            "//div[@id='PowerhitGamesDiv']").click()
 
     def close(self):
         print('Logging out and closing browser')
@@ -31,7 +35,7 @@ class OzLottoDraw(object):
         assert 4 < num_games <= 50
 
         self.driver.find_element_by_xpath(
-            "//div[@id='StandardGamesDiv']/table/tbody/tr/td/select[@id='StandardGameCountSel']/option[@value='%s']" %
+            "//div[@id='PowerhitGamesDiv']/table/tbody/tr/td/select[@id='PowerhitGameCountSel']/option[@value='%s']" %
             num_games).click()
 
     def set_games(self, picked_list):

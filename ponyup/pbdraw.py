@@ -12,7 +12,6 @@ from ponyup.common import login_to_site, logout_of_site, wait_until_clickable
 
 class PowerBallDraw(object):
     def __init__(self, driver, user_name, password):
-        self._closed = False
         self.driver = driver
 
         driver.get('https://thelott.com/nswlotteries')
